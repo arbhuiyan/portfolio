@@ -9,177 +9,127 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script>
+    try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
 </head>
 <body>
+  <div class="progress" id="progress"></div>
+  <div class="spotlight" id="spotlight"></div>
+
   <header class="nav">
     <div class="container nav-inner">
       <a href="#top" class="logo">AR<span>.</span></a>
-      <nav>
+      <nav id="nav-links">
         <a href="#about">About</a>
-        <a href="#experience">Experience</a>
-        <a href="#highlights">Highlights</a>
         <a href="#skills">Skills</a>
+        <a href="#experience">Experience</a>
         <a href="#recognition">Recognition</a>
-        <a href="#contact" class="nav-cta">Contact</a>
       </nav>
+      <div class="nav-actions">
+        <button class="icon-btn" id="theme-toggle" aria-label="Toggle colour theme">
+          <svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+        <a href="https://www.linkedin.com/in/a-rahman94" target="_blank" rel="noopener" class="nav-cta">LinkedIn</a>
+      </div>
     </div>
   </header>
 
   <main id="top">
     <section class="hero container">
-      <p class="eyebrow mono">Hello, I'm</p>
-      <h1>Abdur Rahman</h1>
-      <h2 class="tagline">Senior Full-Stack Engineer <span class="muted">·</span> Cloud, DevOps &amp; AI</h2>
-      <p class="lead">
-        I own the full application lifecycle — architecture and API design, web and mobile front ends,
-        cloud infrastructure, CI/CD, security, testing and production support — and bring hands-on
-        AI engineering to real products.
-      </p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="https://www.linkedin.com/in/a-rahman94" target="_blank" rel="noopener">Connect on LinkedIn</a>
-        <a class="btn btn-ghost" href="#experience">View my work</a>
+      <div class="hero-text reveal">
+        <p class="eyebrow mono">Hello, I'm</p>
+        <h1>Abdur Rahman</h1>
+        <h2 class="tagline">I build <span class="typed" id="typed"></span><span class="caret">|</span></h2>
+        <p class="lead">
+          Senior Full-Stack Engineer working across the whole application lifecycle — architecture and API design,
+          web and mobile front ends, cloud infrastructure, CI/CD, security, testing and production support —
+          with hands-on AI engineering in real products.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#skills">Explore my skills</a>
+          <a class="btn btn-ghost" href="https://www.linkedin.com/in/a-rahman94" target="_blank" rel="noopener">Connect on LinkedIn</a>
+        </div>
+        <p class="location mono">Newcastle upon Tyne, UK · Bangla &amp; English</p>
       </div>
-      <p class="location mono">📍 Newcastle upon Tyne, UK · Bangla &amp; English</p>
-    </section>
 
-    <section class="stats container">
-      <div class="stat"><span class="stat-num">50k+</span><span class="stat-label">monthly users on products I modernised</span></div>
-      <div class="stat"><span class="stat-num">~87%</span><span class="stat-label">staging cost reduction via Kubernetes → ECS</span></div>
-      <div class="stat"><span class="stat-num">70%</span><span class="stat-label">faster provisioning with Infrastructure as Code</span></div>
-      <div class="stat"><span class="stat-num">95%+</span><span class="stat-label">acceptance rate on AI marking agent suggestions</span></div>
+      <div class="terminal reveal" aria-hidden="true">
+        <div class="term-bar"><span></span><span></span><span></span><em class="mono">abdur.ts</em></div>
+        <pre class="mono" id="term-code"></pre>
+      </div>
     </section>
 
     <section id="about" class="section container">
-      <h3 class="section-title"><span class="mono">01.</span> About</h3>
+      <h3 class="section-title reveal"><span class="mono">01.</span> About</h3>
       <div class="about-grid">
-        <div>
+        <div class="reveal">
           <p>
-            I'm a Senior Full-Stack Engineer who has modernised SaaS products serving 50k+ monthly users,
-            evolved architectures across microservices, serverless and modular monoliths, and cut environment
-            costs by around 87%.
+            I'm a Senior Full-Stack Engineer who modernises SaaS products and evolves their architecture across
+            microservices, serverless and modular monoliths — picking the right pattern for each product rather
+            than one size for all.
           </p>
           <p>
-            Today I also act as an internal technical consultant, working with product, design and engineering
-            teams to launch new products and modernise existing ones — defining roadmaps, choosing the right
-            technology stacks and setting standards for AI-assisted development.
+            I also act as an internal technical consultant, working with product, design and engineering teams
+            to launch new products and modernise existing ones: shaping roadmaps, choosing technology stacks and
+            setting standards for AI-assisted development.
           </p>
         </div>
-        <ul class="focus-list">
-          <li><strong>Architecture</strong> Microservices, serverless &amp; modular monoliths</li>
-          <li><strong>Cloud &amp; DevOps</strong> AWS, Terraform, CI/CD, containers</li>
-          <li><strong>Full-Stack</strong> React, Vue, Next.js, Node.js, PHP, React Native</li>
-          <li><strong>AI Engineering</strong> Agentic AI, RAG, MCP, LLM integration</li>
-        </ul>
+        <div class="focus-list">
+          <button class="focus reveal" data-goto="frontend"><strong>Full-Stack</strong><span>React, Vue, Next.js, Node.js, PHP, React Native</span></button>
+          <button class="focus reveal" data-goto="architecture"><strong>Architecture</strong><span>Microservices, serverless &amp; modular monoliths</span></button>
+          <button class="focus reveal" data-goto="cloud"><strong>Cloud &amp; DevOps</strong><span>AWS, Terraform, CI/CD, containers</span></button>
+          <button class="focus reveal" data-goto="ai"><strong>AI Engineering</strong><span>Agentic AI, RAG, MCP, LLM integration</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" class="section container">
+      <h3 class="section-title reveal"><span class="mono">02.</span> Skills</h3>
+      <p class="section-hint reveal">Pick a category, then click any skill to see where I've used it.</p>
+
+      <div class="tabs reveal" id="skill-tabs" role="tablist"></div>
+      <div class="chips reveal" id="skill-chips"></div>
+
+      <div class="usage" id="skill-usage" aria-live="polite">
+        <p class="usage-empty">Select a skill above ↑</p>
       </div>
     </section>
 
     <section id="experience" class="section container">
-      <h3 class="section-title"><span class="mono">02.</span> Experience</h3>
-      <article class="job">
+      <h3 class="section-title reveal"><span class="mono">03.</span> Experience</h3>
+
+      <article class="job reveal">
         <div class="job-head">
-          <div>
+          <div class="job-logo">A</div>
+          <div class="job-title">
             <h4>Senior Software Engineer <span class="at">@ The Access Group</span></h4>
             <p class="job-meta mono">Remote / Hybrid, UK · Previously Software Engineer</p>
           </div>
           <span class="badge"><span class="dot"></span>Ongoing</span>
         </div>
-        <ul class="job-points">
-          <li>Deliver features end to end on <strong>GCSEPod</strong> (50k+ MAU) and HR/compliance SaaS products <strong>Access People for Education</strong> and <strong>Access SCR</strong>: React/Vue front ends, Node.js/PHP APIs, background workers and React Native/Expo mobile apps.</li>
-          <li>Led architecture evolution from monolith to microservices, serverless and modular monolith, choosing the right pattern per product to balance scalability, cost and team velocity.</li>
-          <li>Act as internal technical consultant across the portfolio, defining roadmaps and technology stacks with product, design and engineering teams for new products and modernisation programmes.</li>
-          <li>Moved infrastructure to IaC (Terraform, CloudFormation, Serverless), cutting provisioning time by 70% and eliminating configuration drift.</li>
-          <li>Migrated staging from Kubernetes to AWS ECS with Terraform, cutting costs from ~$600 to ~$80/month (~87%) by eliminating idle capacity.</li>
-          <li>Built CI/CD pipelines in GitLab and Azure DevOps, increasing release frequency from weekly to multiple times daily.</li>
-          <li>Implemented event-driven workflows, OAuth2/SSO, third-party integrations and database/performance optimisation; own security scanning, automated testing, observability and incident response.</li>
-          <li>Mentor engineers, improve onboarding, set standards for AI-assisted development and conduct technical interviews.</li>
-        </ul>
+
+        <p class="job-products">
+          Products: <span>GCSEPod</span><span>Access People for Education</span><span>Access SCR</span>
+        </p>
+
+        <div class="filters" id="exp-filters"></div>
+        <ul class="job-points" id="exp-list"></ul>
       </article>
     </section>
 
-    <section id="highlights" class="section container">
-      <h3 class="section-title"><span class="mono">03.</span> Highlights</h3>
-      <div class="cards">
-        <article class="card">
-          <div class="card-icon">🤖</div>
-          <h4>AI Marking Agent</h4>
-          <p>An AI agent that auto-marks student work and highlights key areas for teacher review. Adopted by the majority of teachers, with a 95%+ suggestion acceptance rate.</p>
-          <div class="tags"><span>Agentic AI</span><span>LLM</span><span>EdTech</span></div>
-        </article>
-        <article class="card">
-          <div class="card-icon">🔎</div>
-          <h4>RAG &amp; MCP Content Search</h4>
-          <p>RAG and MCP-based search over curated educational content, enabling teachers to build high-quality, topic-specific assignments.</p>
-          <div class="tags"><span>RAG</span><span>MCP</span><span>Search</span></div>
-        </article>
-        <article class="card">
-          <div class="card-icon">☁️</div>
-          <h4>Kubernetes → AWS ECS</h4>
-          <p>Re-platformed staging onto ECS with Terraform, eliminating idle capacity and bringing monthly cost from ~$600 down to ~$80.</p>
-          <div class="tags"><span>AWS</span><span>Terraform</span><span>FinOps</span></div>
-        </article>
-        <article class="card">
-          <div class="card-icon">🏗️</div>
-          <h4>Architecture Evolution</h4>
-          <p>Took products from monolith to microservices, serverless and modular monolith — the right pattern per product for scalability, cost and velocity.</p>
-          <div class="tags"><span>Microservices</span><span>Serverless</span><span>DDD</span></div>
-        </article>
-        <article class="card">
-          <div class="card-icon">🚀</div>
-          <h4>Continuous Delivery</h4>
-          <p>CI/CD pipelines in GitLab and Azure DevOps that moved releases from weekly to multiple times a day.</p>
-          <div class="tags"><span>GitLab CI</span><span>Azure DevOps</span></div>
-        </article>
-        <article class="card">
-          <div class="card-icon">📱</div>
-          <h4>Web &amp; Mobile Products</h4>
-          <p>End-to-end delivery across GCSEPod, Access People for Education and Access SCR — web, API, workers and React Native/Expo apps.</p>
-          <div class="tags"><span>React</span><span>Vue</span><span>React Native</span></div>
-        </article>
-      </div>
-    </section>
-
-    <section id="skills" class="section container">
-      <h3 class="section-title"><span class="mono">04.</span> Skills</h3>
-      <div class="skills-grid">
-        <div class="skill-group">
-          <h5>Languages &amp; Frameworks</h5>
-          <div class="chips"><span>TypeScript</span><span>JavaScript</span><span>Node.js</span><span>Express.js</span><span>Next.js</span><span>React</span><span>Vue.js</span><span>React Native</span><span>Expo</span><span>PHP</span><span>Laravel</span><span>.NET (basic)</span><span>HTML</span><span>CSS</span><span>Tailwind CSS</span></div>
-        </div>
-        <div class="skill-group">
-          <h5>Cloud &amp; DevOps</h5>
-          <div class="chips"><span>AWS Lambda</span><span>ECS</span><span>API Gateway</span><span>SQS</span><span>SNS</span><span>EventBridge</span><span>Cognito</span><span>Terraform</span><span>CloudFormation</span><span>Docker</span><span>Kubernetes</span><span>GitLab CI</span><span>Azure DevOps</span><span>Git</span><span>Linux</span><span>Bash</span><span>Nginx</span></div>
-        </div>
-        <div class="skill-group">
-          <h5>Architecture &amp; APIs</h5>
-          <div class="chips"><span>Microservices</span><span>Serverless</span><span>Modular Monolith</span><span>Event-Driven</span><span>Kafka</span><span>DDD</span><span>OOP</span><span>REST</span><span>GraphQL</span><span>WebSockets</span><span>OAuth2</span><span>OIDC</span><span>SSO</span></div>
-        </div>
-        <div class="skill-group">
-          <h5>Databases</h5>
-          <div class="chips"><span>PostgreSQL</span><span>MySQL</span><span>DynamoDB</span><span>NoSQL</span><span>Redis</span><span>Elasticsearch</span></div>
-        </div>
-        <div class="skill-group">
-          <h5>Testing, Security &amp; Monitoring</h5>
-          <div class="chips"><span>Jest</span><span>Cypress</span><span>Playwright</span><span>Unit / Integration / UI</span><span>OWASP</span><span>SonarQube</span><span>Mend</span><span>Prisma Cloud</span><span>CloudWatch</span><span>New Relic</span></div>
-        </div>
-        <div class="skill-group">
-          <h5>AI</h5>
-          <div class="chips"><span>Agentic AI</span><span>RAG</span><span>MCP</span><span>LLM Integration</span><span>Prompt Engineering</span><span>Claude</span><span>GitHub Copilot</span><span>Devin</span></div>
-        </div>
-      </div>
-    </section>
-
     <section id="recognition" class="section container">
-      <h3 class="section-title"><span class="mono">05.</span> Recognition &amp; Certifications</h3>
+      <h3 class="section-title reveal"><span class="mono">04.</span> Recognition &amp; Certifications</h3>
       <div class="recog-grid">
-        <div class="recog">
-          <h5>🏆 Awards</h5>
+        <div class="recog reveal">
+          <h5>Awards</h5>
           <ul>
             <li>Access AI Hackathon — Winner</li>
             <li>Access Game Changer Award — Leading Innovation</li>
           </ul>
         </div>
-        <div class="recog">
-          <h5>📜 Certifications</h5>
+        <div class="recog reveal">
+          <h5>Certifications</h5>
           <ul>
             <li>AWS Certified Developer – Associate</li>
             <li>AWS Knowledge: Serverless</li>
@@ -189,8 +139,8 @@
       </div>
     </section>
 
-    <section id="contact" class="section container contact">
-      <h3 class="section-title center"><span class="mono">06.</span> Get in touch</h3>
+    <section id="contact" class="section container contact reveal">
+      <h3 class="contact-title">Let's build something.</h3>
       <p>Open to conversations about engineering leadership, cloud architecture and building AI into real products.</p>
       <a class="btn btn-primary btn-lg" href="https://www.linkedin.com/in/a-rahman94" target="_blank" rel="noopener">Message me on LinkedIn</a>
     </section>
@@ -202,5 +152,7 @@
       <p class="muted">© Abdur Rahman</p>
     </div>
   </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
