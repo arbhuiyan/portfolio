@@ -65,7 +65,7 @@ if (isDark()) $('meta[name="theme-color"]').setAttribute("content", "#070a16");
 
 $("#theme-toggle").addEventListener("click", () => {
   setTheme(isDark() ? "light" : "dark");
-  if (!isDark()) { spawnBugs(5); showToast("Light mode again? The bugs thank you. 🐛"); }
+  if (!isDark()) { spawnBugs(5); showToast("Light mode again? Here they come. Squash them! 🐛"); }
 });
 
 // ---------- Critical "light attracts bugs" alert ----------
@@ -86,31 +86,115 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.remove(), 3200);
 }
 
-// Bugs crawl towards the light (the theme toggle) and vanish into it
+// ---------- Bug hunt: bugs crawl towards the light (the theme toggle); squash them first ----------
+const hunt = { bugs: new Set(), squashed: 0, escaped: 0, wave: 0, best: 0 };
+try { hunt.best = Number(localStorage.getItem("bugsSquashed")) || 0; } catch (e) {}
+const hud = $("#bug-hud");
+
+function updateHud() {
+  const left = hunt.bugs.size;
+  hud.hidden = !left && !hunt.wave;
+  $("#hud-squashed").textContent = hunt.squashed;
+  $("#hud-left").textContent = left;
+  $("#hud-best").textContent = hunt.best;
+}
+
+function removeBug(b, outcome) {
+  if (!hunt.bugs.has(b)) return;
+  hunt.bugs.delete(b);
+  b.alive = false;
+  if (outcome === "squashed") {
+    hunt.squashed++;
+    hunt.best++;
+    try { localStorage.setItem("bugsSquashed", hunt.best); } catch (e) {}
+    b.el.textContent = "💥";
+    b.el.classList.add("squashed");
+    setTimeout(() => b.el.remove(), 380);
+  } else {
+    if (outcome === "escaped") hunt.escaped++;
+    b.el.style.opacity = "0";
+    setTimeout(() => b.el.remove(), 400);
+  }
+  updateHud();
+  if (!hunt.bugs.size && hunt.wave) endWave();
+}
+
+function endWave() {
+  const { escaped } = hunt;
+  hunt.wave = 0;
+  if (escaped === 0) {
+    showToast("Zero bugs in production. Ship it! 🚀");
+    confetti();
+  } else {
+    showToast(`${escaped} bug${escaped > 1 ? "s" : ""} reached production. Hotfix incoming. 😬`);
+  }
+  setTimeout(updateHud, 3000);
+}
+
 function spawnBugs(count) {
-  if (reduceMotion) return;
-  const target = $("#theme-toggle").getBoundingClientRect();
-  const tx = target.left + target.width / 2, ty = target.top + target.height / 2;
+  if (reduceMotion) return false;
+  if (!hunt.wave) { hunt.wave = 1; hunt.squashed = 0; hunt.escaped = 0; }
   for (let i = 0; i < count; i++) {
-    const bug = document.createElement("span");
-    bug.className = "bug";
-    bug.textContent = ["🐛", "🪲", "🐞", "🦟"][i % 4];
-    document.body.appendChild(bug);
+    const el = document.createElement("button");
+    el.className = "bug";
+    el.setAttribute("aria-label", "Squash bug");
+    el.textContent = ["🐛", "🪲", "🐞", "🦟"][i % 4];
+    document.body.appendChild(el);
     const edge = Math.random();
-    let x = edge < 0.5 ? (Math.random() < 0.5 ? -30 : innerWidth + 30) : Math.random() * innerWidth;
-    let y = edge < 0.5 ? Math.random() * innerHeight : innerHeight + 30;
-    const speed = 1.6 + Math.random() * 1.6;
-    let wobble = Math.random() * 10;
+    const b = {
+      el, alive: true,
+      x: edge < 0.5 ? (Math.random() < 0.5 ? -30 : innerWidth + 30) : Math.random() * innerWidth,
+      y: edge < 0.5 ? Math.random() * innerHeight : innerHeight + 30,
+      speed: 0.9 + Math.random() * 1.1,
+      wobble: Math.random() * 10,
+    };
+    hunt.bugs.add(b);
+    el.addEventListener("pointerdown", (e) => { e.preventDefault(); removeBug(b, "squashed"); });
     const step = () => {
-      const dx = tx - x, dy = ty - y, dist = Math.hypot(dx, dy);
-      if (dist < 14) { bug.style.opacity = "0"; setTimeout(() => bug.remove(), 400); return; }
-      wobble += 0.25;
-      const ang = Math.atan2(dy, dx) + Math.sin(wobble) * 0.5;
-      x += Math.cos(ang) * speed; y += Math.sin(ang) * speed;
-      bug.style.transform = `translate(${x - 11}px, ${y - 11}px) rotate(${ang + Math.PI / 2}rad)`;
+      if (!b.alive) return;
+      const t = $("#theme-toggle").getBoundingClientRect();
+      const dx = t.left + t.width / 2 - b.x, dy = t.top + t.height / 2 - b.y;
+      if (Math.hypot(dx, dy) < 14) return removeBug(b, "escaped");
+      b.wobble += 0.25;
+      const ang = Math.atan2(dy, dx) + Math.sin(b.wobble) * 0.5;
+      b.x += Math.cos(ang) * b.speed; b.y += Math.sin(ang) * b.speed;
+      el.style.transform = `translate(${b.x - 20}px, ${b.y - 20}px) rotate(${ang + Math.PI / 2}rad)`;
       requestAnimationFrame(step);
     };
-    setTimeout(step, i * 220);
+    setTimeout(step, i * 260);
+  }
+  updateHud();
+  return true;
+}
+
+function squashAll() {
+  const n = hunt.bugs.size;
+  [...hunt.bugs].forEach((b) => removeBug(b, "squashed"));
+  return n;
+}
+
+// Lights out: the bugs lose interest and leave (no score either way)
+themeListeners.push((t) => {
+  if (t !== "dark" || !hunt.bugs.size) return;
+  hunt.wave = 0;
+  [...hunt.bugs].forEach((b) => removeBug(b, "left"));
+});
+
+function confetti() {
+  if (reduceMotion) return;
+  const colors = ["#5eead4", "#818cf8", "#f59e0b", "#f472b6", "#22c55e"];
+  for (let i = 0; i < 90; i++) {
+    const p = document.createElement("span");
+    p.className = "confetti";
+    p.style.background = colors[i % colors.length];
+    p.style.left = `${Math.random() * 100}vw`;
+    document.body.appendChild(p);
+    const drift = (Math.random() - 0.5) * 240;
+    p.animate([
+      { transform: "translate(0, -20px) rotate(0deg)", opacity: 1 },
+      { transform: `translate(${drift}px, ${innerHeight + 40}px) rotate(${Math.random() * 720}deg)`, opacity: 0.9 },
+    ], { duration: 1800 + Math.random() * 1400, delay: Math.random() * 300, easing: "cubic-bezier(.2,.6,.4,1)" })
+      .onfinish = () => p.remove();
   }
 }
 
@@ -122,7 +206,7 @@ $("#alert-dark").addEventListener("click", () => {
 $("#alert-bugs").addEventListener("click", () => {
   hideAlert();
   spawnBugs(8);
-  showToast("Don't say we didn't warn you. 🐛");
+  showToast("Squash them before they reach the light! 🐛");
 });
 themeListeners.push((t) => { if (t === "dark") hideAlert(); });
 
@@ -155,7 +239,7 @@ if (!isDark()) setTimeout(() => { if (!isDark()) alertEl.hidden = false; }, 1800
     [' ', '  stack: ['], ['s', '"TypeScript"'], [' ', ', '], ['s', '"React"'], [' ', ', '], ['s', '"AWS"'], [' ', '],\n'],
     [' ', '  status: '], ['s', '"ongoing"'], [' ', ',\n'],
     [' ', '};\n\n'],
-    ['c', '// pick a skill below to explore ↓'],
+    ['c', '// tap or press ~ for a real terminal'],
   ];
   const pre = $("#term-code");
   const render = (n) => {
@@ -303,6 +387,170 @@ listEl.addEventListener("click", (e) => {
 
 renderFilters();
 renderExperience();
+
+// ---------- Terminal mode ----------
+(() => {
+  const modal = $("#term-modal");
+  const out = $("#term-out");
+  const input = $("#term-input");
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const LINKEDIN = '<a href="https://www.linkedin.com/in/a-rahman94" target="_blank" rel="noopener">linkedin.com/in/a-rahman94</a>';
+  const history = [];
+  let hIdx = 0;
+  let lastFocus = null;
+
+  const print = (html, cls = "") => {
+    const line = document.createElement("div");
+    line.className = `term-line ${cls}`;
+    line.innerHTML = html;
+    out.appendChild(line);
+    out.scrollTop = out.scrollHeight;
+  };
+  const list = (items) => items.map((i) => `  <span class="t-dim">›</span> ${i}`).join("\n");
+
+  const files = { "about.txt": "about", "skills/": "skills", "experience/": "experience", "awards.txt": "awards", "certs.txt": "certs", "contact.txt": "contact" };
+
+  const COMMANDS = {
+    help: () => [
+      "Available commands:",
+      ...[
+        ["whoami", "who is this?"], ["about", "the short version"], ["skills [category]", "e.g. skills ai, skills cloud"],
+        ["experience", "what I do"], ["awards", "recognition"], ["certs", "certifications"], ["contact", "get in touch"],
+        ["theme dark|light", "switch theme"], ["hunt", "start a bug hunt"], ["rm -rf bugs", "squash every bug"],
+        ["ls / cat <file>", "browse"], ["clear", "clear screen"], ["exit", "close terminal"],
+      ].map(([c, d]) => `  <span class="t-cmd">${c.padEnd(18)}</span><span class="t-dim">${d}</span>`),
+      "",
+      '<span class="t-dim">Tip: ↑/↓ for history, Tab to autocomplete. There may be a few hidden commands.</span>',
+    ].join("\n"),
+    whoami: () => "<b>Abdur Rahman</b>\nSenior Full-Stack Engineer · Cloud, DevOps &amp; AI\nNewcastle upon Tyne, UK\nSpeaks Bangla, English &amp; Italian",
+    about: () => "Full application lifecycle: architecture and API design, web and mobile front ends,\ncloud infrastructure, CI/CD, security, testing and production support.\nAlso an internal technical consultant helping teams launch and modernise products,\nwith hands-on AI engineering in real products.",
+    skills: (args) => {
+      const q = args.join(" ").toLowerCase();
+      const cats = q ? CATEGORIES.filter((c) => c.id.includes(q) || c.label.toLowerCase().includes(q)) : CATEGORIES;
+      if (!cats.length) return `No category matches "${esc(q)}". Try: ${CATEGORIES.map((c) => c.id).join(", ")}`;
+      return cats.map((c) => `<span class="t-head">${c.label}</span> <span class="t-dim">(${c.id})</span>\n  ${c.skills.join(" · ")}`).join("\n\n");
+    },
+    experience: () => `<span class="t-head">Senior Software Engineer @ The Access Group</span> <span class="t-ok">● ongoing</span>\n<span class="t-dim">Remote / Hybrid, UK · previously Software Engineer</span>\n\n${list(EXPERIENCE.map((e) => e.text))}`,
+    awards: () => list(["Access AI Hackathon — Winner", "Access Game Changer Award — Leading Innovation"]),
+    certs: () => list(["AWS Certified Developer – Associate", "AWS Knowledge: Serverless", "AWS Certified Cloud Practitioner"]),
+    contact: () => `The best way to reach me is LinkedIn:\n  ${LINKEDIN}`,
+    linkedin: () => COMMANDS.contact(),
+    ls: () => Object.keys(files).map((f) => (f.endsWith("/") ? `<span class="t-head">${f}</span>` : f)).join("   "),
+    cat: (args) => {
+      const f = args[0];
+      if (!f) return "usage: cat &lt;file&gt;";
+      const cmd = files[f] || files[`${f}/`];
+      return cmd ? COMMANDS[cmd]([]) : `cat: ${esc(f)}: No such file or directory`;
+    },
+    cd: () => "You're already exactly where you need to be.",
+    pwd: () => "/home/abdur/portfolio",
+    theme: (args) => {
+      const t = args[0];
+      if (t !== "dark" && t !== "light") return "usage: theme dark|light";
+      setTheme(t);
+      if (t === "light") { setTimeout(() => spawnBugs(4), 300); return "Light mode on. You may hear crawling. 🐛"; }
+      return "Dark mode on. Bugs repelled. 🌙";
+    },
+    hunt: () => {
+      if (isDark()) return "It's dark in here. Bugs only come out in the light. Try: theme light";
+      setTimeout(close, 500);
+      setTimeout(() => {
+        if (!spawnBugs(10)) showToast("Reduced motion is on, so the bugs are staying home.");
+        else showToast("Bug hunt started. Squash them before they reach the light! 🐛");
+      }, 800);
+      return "Releasing bugs... good luck. 🐛";
+    },
+    rm: (args) => {
+      if (args.join(" ") !== "-rf bugs") return "rm: refusing to remove that. Try: rm -rf bugs";
+      const n = squashAll();
+      return n ? `Removed ${n} bug${n > 1 ? "s" : ""}. Production is clean. ✨` : "No bugs found. Suspicious, but we'll take it.";
+    },
+    sudo: (args) => {
+      if (args.join(" ").toLowerCase() === "hire abdur") {
+        return `[sudo] password for recruiter: ********\n<span class="t-ok">✔ Permission granted.</span> Great decision.\nNext step: ${LINKEDIN}`;
+      }
+      return "Nice try. This incident will be reported. 🚨";
+    },
+    echo: (args) => esc(args.join(" ")),
+    date: () => "It's shipping time. It's always shipping time.",
+    coffee: () => "☕ Brewing...\nHTTP 418: I'm a teapot.",
+    hello: () => "Hello! 👋 Type 'help' to see what I can do.",
+    exit: () => { setTimeout(close, 150); return "Bye 👋"; },
+    clear: () => { out.innerHTML = ""; return null; },
+    history: () => history.map((h, i) => `  ${String(i + 1).padStart(3)}  ${esc(h)}`).join("\n") || "No history yet.",
+  };
+  COMMANDS.hi = COMMANDS.hello;
+  COMMANDS.exp = COMMANDS.experience;
+  const NAMES = Object.keys(COMMANDS);
+
+  function run(raw) {
+    const line = raw.trim();
+    print(`<span class="t-prompt">abdur@portfolio:~$</span> ${esc(line)}`);
+    if (!line) return;
+    history.push(line);
+    hIdx = history.length;
+    const [name, ...args] = line.split(/\s+/);
+    const cmd = COMMANDS[name.toLowerCase()];
+    const result = cmd ? cmd(args) : `command not found: ${esc(name)}. Type 'help' to see what's available.`;
+    if (result != null) print(result, cmd ? "" : "t-err");
+  }
+
+  function open() {
+    if (!modal.hidden) return;
+    lastFocus = document.activeElement;
+    modal.hidden = false;
+    document.body.classList.add("no-scroll");
+    if (!out.childElementCount) {
+      print('<span class="t-head">abdur-os</span> <span class="t-dim">v1.0 · interactive portfolio shell</span>');
+      print("Type <span class=\"t-cmd\">help</span> to see what's available, or try <span class=\"t-cmd\">whoami</span>.\n");
+    }
+    setTimeout(() => input.focus(), 50);
+  }
+  function close() {
+    if (modal.hidden) return;
+    modal.hidden = true;
+    document.body.classList.remove("no-scroll");
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  $("#term-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    run(input.value);
+    input.value = "";
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowUp" && history.length) {
+      e.preventDefault(); hIdx = Math.max(0, hIdx - 1); input.value = history[hIdx];
+    } else if (e.key === "ArrowDown" && history.length) {
+      e.preventDefault(); hIdx = Math.min(history.length, hIdx + 1); input.value = history[hIdx] || "";
+    } else if (e.key === "Tab") {
+      e.preventDefault();
+      const v = input.value.trim().toLowerCase();
+      if (!v) return;
+      const matches = NAMES.filter((n) => n.startsWith(v));
+      if (matches.length === 1) input.value = `${matches[0]} `;
+      else if (matches.length > 1) print(matches.join("   "), "t-dim");
+    } else if (e.key === "l" && e.ctrlKey) {
+      e.preventDefault(); out.innerHTML = "";
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !modal.hidden) return close();
+    const typing = e.target.closest("input, textarea, [contenteditable]");
+    if (!typing && (e.key === "`" || e.key === "~") && !e.metaKey && !e.ctrlKey) { e.preventDefault(); open(); }
+  });
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) close();
+    else if (!e.target.closest("a, button") && !getSelection().toString()) input.focus();
+  });
+  $("#term-close").addEventListener("click", close);
+  $("#term-open").addEventListener("click", open);
+  $(".terminal").addEventListener("click", open);
+  $(".terminal").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
+})();
 
 // ---------- Mobile menu ----------
 const menuBtn = $("#menu-toggle");
