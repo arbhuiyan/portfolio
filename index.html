@@ -48,7 +48,6 @@
   <link rel="stylesheet" href="styles.css">
   <script>
     document.documentElement.dataset.theme = "light";
-    try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
 </head>
 <body>
@@ -60,7 +59,7 @@
   <div class="bug-hud mono" id="bug-hud" aria-live="polite" hidden>
     <span>🐛 Squashed <b id="hud-squashed">0</b></span>
     <span>Left <b id="hud-left">0</b></span>
-    <span class="hud-best">All-time <b id="hud-best">0</b></span>
+    <span class="hud-best">Total <b id="hud-best">0</b></span>
   </div>
 
   <div class="term-modal" id="term-modal" role="dialog" aria-modal="true" aria-label="Terminal" hidden>

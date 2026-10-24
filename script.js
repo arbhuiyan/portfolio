@@ -56,7 +56,6 @@ const themeListeners = [];
 
 function setTheme(theme) {
   root.dataset.theme = theme;
-  try { localStorage.setItem("theme", theme); } catch (e) {}
   themeListeners.forEach((fn) => fn(theme));
 }
 
@@ -88,7 +87,6 @@ function showToast(msg) {
 
 // ---------- Bug hunt: bugs crawl towards the light (the theme toggle); squash them first ----------
 const hunt = { bugs: new Set(), squashed: 0, escaped: 0, wave: 0, best: 0 };
-try { hunt.best = Number(localStorage.getItem("bugsSquashed")) || 0; } catch (e) {}
 const hud = $("#bug-hud");
 
 function updateHud() {
@@ -106,7 +104,6 @@ function removeBug(b, outcome) {
   if (outcome === "squashed") {
     hunt.squashed++;
     hunt.best++;
-    try { localStorage.setItem("bugsSquashed", hunt.best); } catch (e) {}
     b.el.textContent = "💥";
     b.el.classList.add("squashed");
     setTimeout(() => b.el.remove(), 380);
@@ -566,9 +563,7 @@ let openTerminal = () => {};
   // Promotion: hero callout, "run" badge, a "new" dot until first use, and a ready-to-run command
   function markSeen() {
     root.classList.add("term-seen");
-    try { localStorage.setItem("termSeen", "1"); } catch (e) {}
   }
-  try { if (localStorage.getItem("termSeen")) root.classList.add("term-seen"); } catch (e) {}
 
   openTerminal = (cmd) => {
     open();
