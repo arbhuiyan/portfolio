@@ -231,7 +231,7 @@ if (!isDark()) setTimeout(() => { if (!isDark()) alertEl.hidden = false; }, 1800
 (() => {
   const lines = [
     ['k', 'const'], [' ', ' '], ['v', 'abdur'], [' ', ' = {\n'],
-    [' ', '  role: '], ['s', '"Senior Full-Stack Engineer"'], [' ', ',\n'],
+    [' ', '  role: '], ['s', '"Senior Software Engineer (Full-Stack)"'], [' ', ',\n'],
     [' ', '  focus: ['], ['s', '"Cloud"'], [' ', ', '], ['s', '"DevOps"'], [' ', ', '], ['s', '"AI"'], [' ', '],\n'],
     [' ', '  stack: ['], ['s', '"TypeScript"'], [' ', ', '], ['s', '"React"'], [' ', ', '], ['s', '"PHP"'], [' ', ', '], ['s', '"AWS"'], [' ', '],\n'],
     [' ', '  status: '], ['s', '"ongoing"'], [' ', ',\n'],
@@ -421,7 +421,7 @@ let openTerminal = () => {};
       "",
       '<span class="t-dim">Tip: ↑/↓ for history, Tab to autocomplete. There may be a few hidden commands.</span>',
     ].join("\n"),
-    whoami: () => "<b>Abdur Rahman</b>\nSenior Full-Stack Engineer · Cloud, DevOps &amp; AI\nNewcastle upon Tyne, UK\nSpeaks Bangla, English &amp; Italian",
+    whoami: () => "<b>Abdur Rahman</b>\nSenior Software Engineer (Full-Stack) · Cloud, DevOps &amp; AI\nNewcastle upon Tyne, UK\nSpeaks Bangla, English &amp; Italian",
     about: () => "Full application lifecycle: architecture and API design, web and mobile front ends,\ncloud infrastructure, CI/CD, security, testing and production support.\nAlso an internal technical consultant helping teams launch and modernise products,\nwith hands-on AI engineering in real products.",
     skills: (args) => {
       const q = args.join(" ").toLowerCase();
