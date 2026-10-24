@@ -389,6 +389,7 @@ renderFilters();
 renderExperience();
 
 // ---------- Terminal mode ----------
+let openTerminal = () => {};
 (() => {
   const modal = $("#term-modal");
   const out = $("#term-out");
@@ -505,6 +506,7 @@ renderExperience();
   };
 
   function open() {
+    markSeen();
     if (!modal.hidden) return;
     lastFocus = document.activeElement;
     modal.hidden = false;
@@ -560,6 +562,26 @@ renderExperience();
   });
   $("#term-close").addEventListener("click", close);
   $("#term-open").addEventListener("click", open);
+
+  // Promotion: hero callout, "run" badge, a "new" dot until first use, and a ready-to-run command
+  function markSeen() {
+    root.classList.add("term-seen");
+    try { localStorage.setItem("termSeen", "1"); } catch (e) {}
+  }
+  try { if (localStorage.getItem("termSeen")) root.classList.add("term-seen"); } catch (e) {}
+
+  openTerminal = (cmd) => {
+    open();
+    if (cmd) setTimeout(() => { input.value = cmd; input.focus(); }, 60);
+  };
+  $("#term-promo").addEventListener("click", () => openTerminal("help"));
+  $$("[data-cmd]").forEach((b) => b.addEventListener("click", () => openTerminal(b.dataset.cmd)));
+
+  console.log(
+    "%c>_ abdur-os%c\nHey developer 👋 There's a real terminal on this page.\nPress ~ (or click the >_ button) and try: whoami, skills ai, sudo hire abdur",
+    "font: 700 16px monospace; color: #5eead4; background: #0b1020; padding: 4px 8px; border-radius: 4px;",
+    "font: 13px monospace; color: inherit;"
+  );
   $(".terminal").addEventListener("click", open);
   $(".terminal").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
 })();
