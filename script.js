@@ -50,13 +50,80 @@ const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // ---------- Theme ----------
+const root = document.documentElement;
+const isDark = () => root.dataset.theme === "dark";
+const themeListeners = [];
+
+function setTheme(theme) {
+  root.dataset.theme = theme;
+  try { localStorage.setItem("theme", theme); } catch (e) {}
+  themeListeners.forEach((fn) => fn(theme));
+}
+
 $("#theme-toggle").addEventListener("click", () => {
-  const root = document.documentElement;
-  const current = root.dataset.theme || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
-  const next = current === "dark" ? "light" : "dark";
-  root.dataset.theme = next;
-  try { localStorage.setItem("theme", next); } catch (e) {}
+  setTheme(isDark() ? "light" : "dark");
+  if (!isDark()) { spawnBugs(5); showToast("Light mode again? The bugs thank you. 🐛"); }
 });
+
+// ---------- Critical "light attracts bugs" alert ----------
+const alertEl = $("#bug-alert");
+
+function hideAlert() {
+  if (alertEl.hidden) return;
+  alertEl.classList.add("out");
+  setTimeout(() => { alertEl.hidden = true; alertEl.classList.remove("out"); }, 300);
+}
+
+let toastTimer;
+function showToast(msg) {
+  let t = $(".toast");
+  if (!t) { t = document.createElement("div"); t.className = "toast"; document.body.appendChild(t); }
+  t.textContent = msg;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.remove(), 3200);
+}
+
+// Bugs crawl towards the light (the theme toggle) and vanish into it
+function spawnBugs(count) {
+  if (reduceMotion) return;
+  const target = $("#theme-toggle").getBoundingClientRect();
+  const tx = target.left + target.width / 2, ty = target.top + target.height / 2;
+  for (let i = 0; i < count; i++) {
+    const bug = document.createElement("span");
+    bug.className = "bug";
+    bug.textContent = ["🐛", "🪲", "🐞", "🦟"][i % 4];
+    document.body.appendChild(bug);
+    const edge = Math.random();
+    let x = edge < 0.5 ? (Math.random() < 0.5 ? -30 : innerWidth + 30) : Math.random() * innerWidth;
+    let y = edge < 0.5 ? Math.random() * innerHeight : innerHeight + 30;
+    const speed = 1.6 + Math.random() * 1.6;
+    let wobble = Math.random() * 10;
+    const step = () => {
+      const dx = tx - x, dy = ty - y, dist = Math.hypot(dx, dy);
+      if (dist < 14) { bug.style.opacity = "0"; setTimeout(() => bug.remove(), 400); return; }
+      wobble += 0.25;
+      const ang = Math.atan2(dy, dx) + Math.sin(wobble) * 0.5;
+      x += Math.cos(ang) * speed; y += Math.sin(ang) * speed;
+      bug.style.transform = `translate(${x - 11}px, ${y - 11}px) rotate(${ang + Math.PI / 2}rad)`;
+      requestAnimationFrame(step);
+    };
+    setTimeout(step, i * 220);
+  }
+}
+
+$("#alert-dark").addEventListener("click", () => {
+  setTheme("dark");
+  hideAlert();
+  showToast("Threat neutralised. Welcome to the dark side. 🌙");
+});
+$("#alert-bugs").addEventListener("click", () => {
+  hideAlert();
+  spawnBugs(8);
+  showToast("Don't say we didn't warn you. 🐛");
+});
+themeListeners.push((t) => { if (t === "dark") hideAlert(); });
+
+if (!isDark()) setTimeout(() => { if (!isDark()) alertEl.hidden = false; }, 1800);
 
 // ---------- Typed tagline ----------
 (() => {
@@ -256,11 +323,116 @@ const onScroll = () => {
 window.addEventListener("scroll", onScroll, { passive: true });
 onScroll();
 
-// ---------- Cursor spotlight ----------
+// ---------- Cursor spotlight + glowing card borders ----------
+const pointer = { x: -9999, y: -9999 };
 if (!reduceMotion && matchMedia("(pointer: fine)").matches) {
   const spot = $("#spotlight");
   window.addEventListener("pointermove", (e) => {
+    pointer.x = e.clientX; pointer.y = e.clientY;
     spot.style.setProperty("--x", `${e.clientX}px`);
     spot.style.setProperty("--y", `${e.clientY}px`);
+    const card = e.target.closest && e.target.closest(".glow");
+    if (card) {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty("--mx", `${e.clientX - r.left}px`);
+      card.style.setProperty("--my", `${e.clientY - r.top}px`);
+    }
   }, { passive: true });
+  document.addEventListener("pointerleave", () => { pointer.x = pointer.y = -9999; });
 }
+
+// ---------- Futuristic background: particle network that lights up on scroll & hover ----------
+(() => {
+  const canvas = $("#bg-canvas");
+  const ctx = canvas.getContext("2d");
+  let w, h, dpr, nodes = [], colors;
+  let energy = 0, lastScroll = scrollY;
+
+  const readColors = () => {
+    const cs = getComputedStyle(root);
+    colors = { a: cs.getPropertyValue("--accent").trim(), b: cs.getPropertyValue("--accent-2").trim(), dark: isDark() };
+  };
+  const hexA = (hex, a) => {
+    const n = parseInt(hex.slice(1), 16);
+    return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`;
+  };
+
+  function resize() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    w = innerWidth; h = innerHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const count = Math.round(Math.min(110, (w * h) / 14000));
+    nodes = Array.from({ length: count }, () => ({
+      x: Math.random() * w, y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+      r: 1 + Math.random() * 1.6, c: Math.random() < 0.5 ? "a" : "b", depth: 0.3 + Math.random() * 0.7,
+    }));
+  }
+
+  // Light pulses that travel along connections
+  const pulses = [];
+
+  function frame() {
+    const dy = scrollY - lastScroll;
+    lastScroll = scrollY;
+    energy = Math.min(1, energy * 0.94 + Math.abs(dy) * 0.004);
+    root.style.setProperty("--energy", energy.toFixed(3));
+    root.style.setProperty("--grid-y", `${(-scrollY * 0.6) % 64}px`);
+
+    ctx.clearRect(0, 0, w, h);
+    const base = colors.dark ? 0.18 : 0.12;
+    const linkDist = 140;
+
+    for (const n of nodes) {
+      const boost = 1 + energy * 4;
+      n.x += n.vx * boost;
+      n.y += n.vy * boost - dy * 0.15 * n.depth;
+      if (n.x < -20) n.x = w + 20; if (n.x > w + 20) n.x = -20;
+      if (n.y < -20) n.y = h + 20; if (n.y > h + 20) n.y = -20;
+    }
+
+    for (let i = 0; i < nodes.length; i++) {
+      const p = nodes[i];
+      const pm = Math.hypot(p.x - pointer.x, p.y - pointer.y);
+      for (let j = i + 1; j < nodes.length; j++) {
+        const q = nodes[j];
+        const d = Math.hypot(p.x - q.x, p.y - q.y);
+        if (d > linkDist) continue;
+        const near = Math.max(0, 1 - Math.min(pm, Math.hypot(q.x - pointer.x, q.y - pointer.y)) / 220);
+        const alpha = (1 - d / linkDist) * (base + energy * 0.45 + near * 0.7);
+        ctx.strokeStyle = hexA(colors[p.c], Math.min(alpha, 0.9));
+        ctx.lineWidth = near > 0.2 ? 1.2 : 0.7;
+        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+        if (pulses.length < 14 && Math.random() < 0.0004 + energy * 0.004 + near * 0.004) pulses.push({ p, q, t: 0 });
+      }
+    }
+
+    for (const n of nodes) {
+      const near = Math.max(0, 1 - Math.hypot(n.x - pointer.x, n.y - pointer.y) / 200);
+      ctx.fillStyle = hexA(colors[n.c], Math.min(1, 0.35 + near + energy * 0.5));
+      ctx.shadowColor = colors[n.c];
+      ctx.shadowBlur = near * 18 + energy * 10;
+      ctx.beginPath(); ctx.arc(n.x, n.y, n.r + near * 2, 0, Math.PI * 2); ctx.fill();
+    }
+
+    for (let i = pulses.length - 1; i >= 0; i--) {
+      const s = pulses[i];
+      s.t += 0.025;
+      if (s.t >= 1) { pulses.splice(i, 1); continue; }
+      const x = s.p.x + (s.q.x - s.p.x) * s.t, y = s.p.y + (s.q.y - s.p.y) * s.t;
+      ctx.fillStyle = hexA(colors.a, 0.95);
+      ctx.shadowColor = colors.a; ctx.shadowBlur = 16;
+      ctx.beginPath(); ctx.arc(x, y, 2.2, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+
+    if (!reduceMotion) requestAnimationFrame(frame);
+  }
+
+  readColors();
+  resize();
+  themeListeners.push(() => requestAnimationFrame(readColors));
+  addEventListener("resize", resize);
+  requestAnimationFrame(frame);
+})();

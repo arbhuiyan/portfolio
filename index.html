@@ -10,12 +10,36 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script>
+    document.documentElement.dataset.theme = "light";
     try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
 </head>
 <body>
   <div class="progress" id="progress"></div>
+  <canvas class="bg-canvas" id="bg-canvas" aria-hidden="true"></canvas>
+  <div class="grid-floor" aria-hidden="true"></div>
   <div class="spotlight" id="spotlight"></div>
+
+  <div class="alert" id="bug-alert" role="alertdialog" aria-labelledby="alert-title" aria-describedby="alert-body" hidden>
+    <div class="alert-stripe"></div>
+    <div class="alert-inner">
+      <div class="alert-head">
+        <span class="alert-icon">⚠</span>
+        <div>
+          <p class="alert-kicker mono">CRITICAL ALERT · SEV-1</p>
+          <h4 id="alert-title">Light mode detected</h4>
+        </div>
+      </div>
+      <p id="alert-body">
+        Bright screens are known to attract <b>bugs</b>. Our monitoring has already spotted several heading for your viewport.
+      </p>
+      <code class="alert-code mono">ERR_LIGHT_ATTRACTS_BUGS · 0x0B0G</code>
+      <div class="alert-actions">
+        <button class="btn btn-danger" id="alert-dark">Switch to dark mode 🌙</button>
+        <button class="btn btn-ghost" id="alert-bugs">I like bugs 🐛</button>
+      </div>
+    </div>
+  </div>
 
   <header class="nav">
     <div class="container nav-inner">
@@ -54,7 +78,7 @@
         <p class="location mono">Newcastle upon Tyne, UK · Bangla, English &amp; Italian</p>
       </div>
 
-      <div class="terminal reveal" aria-hidden="true">
+      <div class="terminal glow reveal" aria-hidden="true">
         <div class="term-bar"><span></span><span></span><span></span><em class="mono">abdur.ts</em></div>
         <pre class="mono" id="term-code"></pre>
       </div>
@@ -76,10 +100,10 @@
           </p>
         </div>
         <div class="focus-list">
-          <button class="focus reveal" data-goto="frontend"><strong>Full-Stack</strong><span>React, Vue, Next.js, Node.js, PHP, React Native</span></button>
-          <button class="focus reveal" data-goto="architecture"><strong>Architecture</strong><span>Microservices, serverless &amp; modular monoliths</span></button>
-          <button class="focus reveal" data-goto="cloud"><strong>Cloud &amp; DevOps</strong><span>AWS, Terraform, CI/CD, containers</span></button>
-          <button class="focus reveal" data-goto="ai"><strong>AI Engineering</strong><span>Agentic AI, RAG, MCP, LLM integration</span></button>
+          <button class="focus glow reveal" data-goto="frontend"><strong>Full-Stack</strong><span>React, Vue, Next.js, Node.js, PHP, React Native</span></button>
+          <button class="focus glow reveal" data-goto="architecture"><strong>Architecture</strong><span>Microservices, serverless &amp; modular monoliths</span></button>
+          <button class="focus glow reveal" data-goto="cloud"><strong>Cloud &amp; DevOps</strong><span>AWS, Terraform, CI/CD, containers</span></button>
+          <button class="focus glow reveal" data-goto="ai"><strong>AI Engineering</strong><span>Agentic AI, RAG, MCP, LLM integration</span></button>
         </div>
       </div>
     </section>
@@ -91,7 +115,7 @@
       <div class="tabs reveal" id="skill-tabs" role="tablist"></div>
       <div class="chips reveal" id="skill-chips"></div>
 
-      <div class="usage" id="skill-usage" aria-live="polite">
+      <div class="usage glow" id="skill-usage" aria-live="polite">
         <p class="usage-empty">Select a skill above ↑</p>
       </div>
     </section>
@@ -99,7 +123,7 @@
     <section id="experience" class="section container">
       <h3 class="section-title reveal"><span class="mono">03.</span> Experience</h3>
 
-      <article class="job reveal">
+      <article class="job glow reveal">
         <div class="job-head">
           <div class="job-logo">A</div>
           <div class="job-title">
@@ -121,14 +145,14 @@
     <section id="recognition" class="section container">
       <h3 class="section-title reveal"><span class="mono">04.</span> Recognition &amp; Certifications</h3>
       <div class="recog-grid">
-        <div class="recog reveal">
+        <div class="recog glow reveal">
           <h5>Awards</h5>
           <ul>
             <li>Access AI Hackathon — Winner</li>
             <li>Access Game Changer Award — Leading Innovation</li>
           </ul>
         </div>
-        <div class="recog reveal">
+        <div class="recog glow reveal">
           <h5>Certifications</h5>
           <ul>
             <li>AWS Certified Developer – Associate</li>
