@@ -495,10 +495,20 @@ renderExperience();
     if (result != null) print(result, cmd ? "" : "t-err");
   }
 
+  // Size the terminal to the visible area so the mobile keyboard can't push it off-screen
+  const vv = window.visualViewport;
+  const fit = () => {
+    if (!vv || modal.hidden) return;
+    modal.style.top = `${vv.offsetTop}px`;
+    modal.style.height = `${vv.height}px`;
+    out.scrollTop = out.scrollHeight;
+  };
+
   function open() {
     if (!modal.hidden) return;
     lastFocus = document.activeElement;
     modal.hidden = false;
+    if (vv) { vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit); fit(); }
     document.body.classList.add("no-scroll");
     if (!out.childElementCount) {
       print('<span class="t-head">abdur-os</span> <span class="t-dim">v1.0 · interactive portfolio shell</span>');
@@ -509,6 +519,8 @@ renderExperience();
   function close() {
     if (modal.hidden) return;
     modal.hidden = true;
+    if (vv) { vv.removeEventListener("resize", fit); vv.removeEventListener("scroll", fit); }
+    modal.style.top = modal.style.height = "";
     document.body.classList.remove("no-scroll");
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }

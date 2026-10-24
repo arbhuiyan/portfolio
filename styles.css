@@ -143,7 +143,7 @@ main, .footer { position: relative; z-index: 1; }
 }
 body.no-scroll { overflow: hidden; }
 .term-modal {
-  position: fixed; inset: 0; z-index: 80; display: grid; place-items: center;
+  position: fixed; top: 0; left: 0; right: 0; height: 100%; z-index: 80; display: grid; place-items: center;
   padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
   background: rgba(5, 8, 20, 0.55); backdrop-filter: blur(6px); animation: fade-in 0.2s both;
 }
@@ -487,7 +487,7 @@ body.no-scroll { overflow: hidden; }
   .bug-hud { top: calc(66px + env(safe-area-inset-top, 0px)); gap: 10px; font-size: 0.74rem; padding: 7px 12px; }
   .hud-best { display: none; }
   .term-modal { place-items: end stretch; padding-bottom: max(10px, env(safe-area-inset-bottom, 0px)); }
-  .term-window { height: min(78vh, 100%); width: 100%; }
+  .term-window { height: min(78vh, 100%); height: min(78dvh, 100%); width: 100%; }
   .term-out { font-size: 0.76rem; padding: 12px 14px 4px; }
   .term-form { padding: 8px 14px 14px; font-size: 0.78rem; }
   .term-form .t-prompt { font-size: 0.72rem; }
