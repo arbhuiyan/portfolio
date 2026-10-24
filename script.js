@@ -233,7 +233,7 @@ if (!isDark()) setTimeout(() => { if (!isDark()) alertEl.hidden = false; }, 1800
     ['k', 'const'], [' ', ' '], ['v', 'abdur'], [' ', ' = {\n'],
     [' ', '  role: '], ['s', '"Senior Full-Stack Engineer"'], [' ', ',\n'],
     [' ', '  focus: ['], ['s', '"Cloud"'], [' ', ', '], ['s', '"DevOps"'], [' ', ', '], ['s', '"AI"'], [' ', '],\n'],
-    [' ', '  stack: ['], ['s', '"TypeScript"'], [' ', ', '], ['s', '"React"'], [' ', ', '], ['s', '"AWS"'], [' ', '],\n'],
+    [' ', '  stack: ['], ['s', '"TypeScript"'], [' ', ', '], ['s', '"React"'], [' ', ', '], ['s', '"PHP"'], [' ', ', '], ['s', '"AWS"'], [' ', '],\n'],
     [' ', '  status: '], ['s', '"ongoing"'], [' ', ',\n'],
     [' ', '};\n\n'],
     ['c', '// tap or press ~ for a real terminal'],
@@ -248,7 +248,8 @@ if (!isDark()) setTimeout(() => { if (!isDark()) alertEl.hidden = false; }, 1800
       const safe = part.replace(/</g, "&lt;");
       html += cls === " " ? safe : `<span class="t-${cls}">${safe}</span>`;
     }
-    pre.innerHTML = html + '<span class="caret">▋</span>';
+    // One block per code line so wrapped lines get a hanging indent on narrow screens
+    pre.innerHTML = (html + '<span class="caret">▋</span>').split("\n").map((l) => `<span class="ln">${l}</span>`).join("");
   };
   const total = lines.reduce((a, [, t]) => a + t.length, 0);
   if (reduceMotion) return render(total);

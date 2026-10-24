@@ -280,6 +280,7 @@ body.no-scroll { overflow: hidden; }
 .term-bar span:nth-child(3) { background: #28c840; }
 .term-bar em { margin-left: auto; font-style: normal; font-size: 0.75rem; color: var(--muted); }
 .terminal pre { padding: 20px; font-size: 0.85rem; line-height: 1.75; min-height: 240px; white-space: pre-wrap; color: var(--text); }
+.terminal .ln { display: block; min-height: 1.75em; padding-left: 4ch; text-indent: -4ch; }
 .t-k { color: var(--accent-2); } .t-v { color: var(--accent); } .t-s { color: #f59e0b; } .t-c { color: var(--muted); font-style: italic; }
 
 /* Sections */
