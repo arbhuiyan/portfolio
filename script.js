@@ -60,6 +60,9 @@ function setTheme(theme) {
   themeListeners.forEach((fn) => fn(theme));
 }
 
+themeListeners.push((t) => $('meta[name="theme-color"]').setAttribute("content", t === "dark" ? "#070a16" : "#f6f7fb"));
+if (isDark()) $('meta[name="theme-color"]').setAttribute("content", "#070a16");
+
 $("#theme-toggle").addEventListener("click", () => {
   setTheme(isDark() ? "light" : "dark");
   if (!isDark()) { spawnBugs(5); showToast("Light mode again? The bugs thank you. 🐛"); }
@@ -152,7 +155,7 @@ if (!isDark()) setTimeout(() => { if (!isDark()) alertEl.hidden = false; }, 1800
     [' ', '  stack: ['], ['s', '"TypeScript"'], [' ', ', '], ['s', '"React"'], [' ', ', '], ['s', '"AWS"'], [' ', '],\n'],
     [' ', '  status: '], ['s', '"ongoing"'], [' ', ',\n'],
     [' ', '};\n\n'],
-    ['c', '// click a skill below to explore ↓'],
+    ['c', '// pick a skill below to explore ↓'],
   ];
   const pre = $("#term-code");
   const render = (n) => {
@@ -301,6 +304,18 @@ listEl.addEventListener("click", (e) => {
 renderFilters();
 renderExperience();
 
+// ---------- Mobile menu ----------
+const menuBtn = $("#menu-toggle");
+const navEl = $("#nav-links");
+const setMenu = (open) => {
+  navEl.classList.toggle("open", open);
+  menuBtn.setAttribute("aria-expanded", open);
+  menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+};
+menuBtn.addEventListener("click", () => setMenu(!navEl.classList.contains("open")));
+navEl.addEventListener("click", (e) => { if (e.target.closest("a")) setMenu(false); });
+document.addEventListener("click", (e) => { if (!e.target.closest(".nav")) setMenu(false); });
+
 // ---------- Scroll reveal ----------
 const io = new IntersectionObserver((entries) => {
   entries.forEach((en) => {
@@ -339,6 +354,16 @@ if (!reduceMotion && matchMedia("(pointer: fine)").matches) {
     }
   }, { passive: true });
   document.addEventListener("pointerleave", () => { pointer.x = pointer.y = -9999; });
+} else if (!reduceMotion) {
+  // Touch: light up the network where the finger is, then let it fade
+  let fade;
+  const touch = (e) => {
+    pointer.x = e.clientX; pointer.y = e.clientY;
+    clearTimeout(fade);
+    fade = setTimeout(() => { pointer.x = pointer.y = -9999; }, 900);
+  };
+  window.addEventListener("pointerdown", touch, { passive: true });
+  window.addEventListener("pointermove", touch, { passive: true });
 }
 
 // ---------- Futuristic background: particle network that lights up on scroll & hover ----------
@@ -358,10 +383,12 @@ if (!reduceMotion && matchMedia("(pointer: fine)").matches) {
   };
 
   function resize() {
+    const rebuild = !nodes.length || innerWidth !== w || Math.abs(innerHeight - h) > 160;
     dpr = Math.min(devicePixelRatio || 1, 2);
     w = innerWidth; h = innerHeight;
     canvas.width = w * dpr; canvas.height = h * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (!rebuild) return;
     const count = Math.round(Math.min(110, (w * h) / 14000));
     nodes = Array.from({ length: count }, () => ({
       x: Math.random() * w, y: Math.random() * h,

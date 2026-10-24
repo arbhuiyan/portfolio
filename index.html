@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f7fb">
   <title>Abdur Rahman — Senior Full-Stack Engineer</title>
   <meta name="description" content="Abdur Rahman, Senior Full-Stack Engineer specialising in Cloud, DevOps and AI. Based in Newcastle upon Tyne, UK.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,11 +32,11 @@
         </div>
       </div>
       <p id="alert-body">
-        Bright screens are known to attract <b>bugs</b>. Our monitoring has already spotted several heading for your viewport.
+        Bright screens are known to attract <b>bugs</b>.<span class="hide-sm"> Our monitoring has already spotted several heading for your viewport.</span>
       </p>
       <code class="alert-code mono">ERR_LIGHT_ATTRACTS_BUGS · 0x0B0G</code>
       <div class="alert-actions">
-        <button class="btn btn-danger" id="alert-dark">Switch to dark mode 🌙</button>
+        <button class="btn btn-danger" id="alert-dark"><span class="hide-sm">Switch to dark mode</span><span class="show-sm">Go dark</span> 🌙</button>
         <button class="btn btn-ghost" id="alert-bugs">I like bugs 🐛</button>
       </div>
     </div>
@@ -56,6 +57,9 @@
           <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
         </button>
         <a href="https://www.linkedin.com/in/a-rahman94" target="_blank" rel="noopener" class="nav-cta">LinkedIn</a>
+        <button class="icon-btn menu-btn" id="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </div>
   </header>
@@ -110,7 +114,7 @@
 
     <section id="skills" class="section container">
       <h3 class="section-title reveal"><span class="mono">02.</span> Skills</h3>
-      <p class="section-hint reveal">Pick a category, then click any skill to see where I've used it.</p>
+      <p class="section-hint reveal">Pick a category, then choose any skill to see where I've used it.</p>
 
       <div class="tabs reveal" id="skill-tabs" role="tablist"></div>
       <div class="chips reveal" id="skill-chips"></div>
